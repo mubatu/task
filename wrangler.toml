@@ -1,0 +1,9 @@
+name = "task"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-09-16"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "task"
+database_id = "b89f037e-36ca-4be3-9f84-7252213a1211"
+migrations_dir = "migrations"

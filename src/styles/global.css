@@ -1,0 +1,44 @@
+:root {
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #171b24;
+  background: #f4f5f7;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --ink: #171b24;
+  --muted: #6b7280;
+  --line: #e3e5e9;
+  --surface: #ffffff;
+  --canvas: #f4f5f7;
+  --dark: #171b24;
+  --accent: #c8f05a;
+  --accent-dark: #71920f;
+  --danger: #d83a4e;
+  --danger-soft: #fff1f3;
+  --reminder: #7357d9;
+  --radius: 18px;
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; background: var(--canvas); }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--canvas); }
+button, input, textarea { font: inherit; }
+button { color: inherit; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid rgba(115, 87, 217, .28); outline-offset: 2px; }
+h1, h2, h3, p { margin-top: 0; }
+
+.eyebrow { margin: 0 0 8px; font-size: .75rem; line-height: 1.2; font-weight: 800; letter-spacing: .13em; color: var(--accent-dark); }
+.button { min-height: 46px; padding: 0 18px; border: 0; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 750; cursor: pointer; transition: transform .16s ease, background .16s ease, opacity .16s ease; }
+.button:hover:not(:disabled) { transform: translateY(-1px); }
+.button:disabled { opacity: .55; cursor: wait; }
+.button--primary { background: var(--dark); color: white; }
+.button--primary:hover:not(:disabled) { background: #282e3b; }
+.button--ghost { background: #eef0f3; color: var(--ink); }
+.button--danger { background: var(--danger); color: white; }
+.icon-button { width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 12px; background: white; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.form-error { margin: 10px 0 0; color: #b71f34; font-size: .9rem; }
+.global-toast { position: fixed; z-index: 70; top: 20px; left: 50%; transform: translateX(-50%); max-width: min(520px, calc(100vw - 32px)); padding: 12px 14px; border: 1px solid #f2aeb8; border-radius: 12px; background: #fff4f5; box-shadow: 0 16px 45px rgba(23, 27, 36, .16); display: flex; align-items: center; gap: 16px; color: #9e1e31; }
+.global-toast button { margin-left: auto; border: 0; background: none; font-weight: 750; cursor: pointer; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+}

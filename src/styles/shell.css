@@ -1,0 +1,39 @@
+.app-shell { min-height: 100vh; }
+.sidebar { position: fixed; inset: 0 auto 0 0; z-index: 20; width: 254px; padding: 24px 18px; background: var(--dark); color: white; display: flex; flex-direction: column; }
+.brand { border: 0; background: none; padding: 0 8px; color: inherit; display: inline-flex; align-items: center; gap: 11px; font-size: 1.25rem; font-weight: 850; cursor: pointer; }
+.brand-mark { width: 36px; height: 36px; border-radius: 11px; background: var(--accent); color: var(--dark); display: inline-flex; align-items: center; justify-content: center; }
+.desktop-nav { margin-top: 48px; display: grid; gap: 6px; }
+.nav-item { width: 100%; min-height: 48px; padding: 0 14px; border: 0; border-radius: 12px; background: transparent; color: #aeb4c0; display: flex; align-items: center; gap: 12px; font-size: .95rem; font-weight: 650; text-align: left; cursor: pointer; }
+.nav-item:hover { background: rgba(255,255,255,.06); color: white; }
+.nav-item--active { background: var(--accent); color: var(--dark); }
+.nav-item--active:hover { background: var(--accent); color: var(--dark); }
+.sidebar-profile { margin-top: auto; padding: 15px 10px 0; border-top: 1px solid rgba(255,255,255,.1); display: flex; align-items: center; gap: 11px; }
+.profile-avatar { width: 38px; height: 38px; border-radius: 50%; background: #303746; color: var(--accent); display: inline-flex; align-items: center; justify-content: center; }
+.sidebar-profile strong { display: block; max-width: 145px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .9rem; }
+.sidebar-profile button { padding: 3px 0 0; border: 0; background: none; color: #9da4b1; font-size: .76rem; cursor: pointer; }
+.main-content { min-height: 100vh; margin-left: 254px; }
+.page-content { width: min(1120px, 100%); margin: 0 auto; padding: 52px 40px 80px; }
+.page-header { margin-bottom: 28px; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+.page-header h1 { margin: 0; font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1; letter-spacing: -.055em; }
+.page-header p:last-child { margin: 10px 0 0; color: var(--muted); }
+.offline-banner { position: sticky; top: 0; z-index: 15; padding: 10px 20px; background: #2e3442; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: .85rem; }
+.mobile-header, .mobile-nav, .floating-add { display: none; }
+
+@media (max-width: 800px) {
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; padding-bottom: 84px; }
+  .mobile-header { height: 68px; padding: 0 18px; background: var(--dark); color: white; display: flex; align-items: center; justify-content: space-between; }
+  .mobile-header .brand { padding: 0; font-size: 1.1rem; }
+  .mobile-header .brand-mark { width: 32px; height: 32px; border-radius: 9px; }
+  .mobile-profile { width: 36px; height: 36px; border: 1px solid rgba(255,255,255,.16); border-radius: 50%; background: #303746; color: white; font-weight: 800; cursor: pointer; }
+  .page-content { padding: 32px 16px 36px; }
+  .page-header { align-items: center; }
+  .page-header h1 { font-size: 2.25rem; }
+  .page-header .desktop-add { display: none; }
+  .mobile-nav { position: fixed; z-index: 40; inset: auto 0 0; height: 70px; padding: 7px 8px max(7px, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(255,255,255,.96); backdrop-filter: blur(14px); display: grid; grid-template-columns: repeat(3, 1fr); }
+  .mobile-nav-item { border: 0; background: transparent; color: #808694; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: .68rem; font-weight: 700; cursor: pointer; }
+  .mobile-nav-item svg { width: 21px; height: 21px; }
+  .mobile-nav-item--active { color: var(--ink); }
+  .floating-add { position: fixed; z-index: 45; right: 18px; bottom: 84px; width: 54px; height: 54px; border: 0; border-radius: 17px; background: var(--accent); color: var(--dark); box-shadow: 0 12px 30px rgba(45, 59, 6, .25); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .floating-add svg { width: 25px; height: 25px; }
+}

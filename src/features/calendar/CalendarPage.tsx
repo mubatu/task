@@ -19,11 +19,12 @@ interface CalendarPageProps {
   pendingItemId: string | null;
   onAdd: () => void;
   onComplete: (item: Item) => void;
+  onEdit: (item: Item) => void;
 }
 
 const weekDays = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 
-export function CalendarPage({ items, nowMs, pendingItemId, onAdd, onComplete }: CalendarPageProps) {
+export function CalendarPage({ items, nowMs, pendingItemId, onAdd, onComplete, onEdit }: CalendarPageProps) {
   const currentDateKey = todayKey(nowMs);
   const [month, setMonth] = useState(() => currentMonthKey(nowMs));
   const [selectedDate, setSelectedDate] = useState(currentDateKey);
@@ -120,7 +121,7 @@ export function CalendarPage({ items, nowMs, pendingItemId, onAdd, onComplete }:
                 item={item}
                 overdue={isItemOverdue(item, nowMs, currentDateKey)}
                 pending={pendingItemId === item.id}
-                onAction={onComplete}
+                onEdit={onEdit} onAction={onComplete}
               />
             ))}
           </div>

@@ -4,6 +4,7 @@ import type {
   Item,
   ItemsResponse,
   ItemStatus,
+  UpdateItemRequest,
   UserProfile,
 } from "../../shared/contracts";
 
@@ -53,5 +54,12 @@ export function updateItemStatus(
   return request<Item>(`/api/items/${itemId}`, {
     method: "PATCH",
     body: JSON.stringify({ userId, status }),
+  });
+}
+
+export function updateItem(itemId: string, input: UpdateItemRequest): Promise<Item> {
+  return request<Item>(`/api/items/${itemId}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
   });
 }

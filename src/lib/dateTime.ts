@@ -37,6 +37,17 @@ export function formatTime(timestamp: number): string {
   }).format(new Date(timestamp));
 }
 
+export function toIstanbulDateTimeInput(timestamp: number): string {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: APP_TIME_ZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(timestamp));
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${dateKeyFromTimestamp(timestamp)}T${values.hour}:${values.minute}`;
+}
+
 export function formatDateTime(timestamp: number): string {
   return new Intl.DateTimeFormat("tr-TR", {
     timeZone: APP_TIME_ZONE,

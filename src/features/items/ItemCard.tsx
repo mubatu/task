@@ -1,5 +1,5 @@
 import type { Item } from "../../../shared/contracts";
-import { CalendarIcon, CheckIcon, ClockIcon, TaskIcon } from "../../components/Icons";
+import { CalendarIcon, CheckIcon, ClockIcon, EditIcon, TaskIcon } from "../../components/Icons";
 import { formatDate, formatDateTime } from "../../lib/dateTime";
 
 interface ItemCardProps {
@@ -8,9 +8,10 @@ interface ItemCardProps {
   actionLabel?: string;
   pending?: boolean;
   onAction: (item: Item) => void;
+  onEdit: (item: Item) => void;
 }
 
-export function ItemCard({ item, overdue = false, actionLabel = "Tamamla", pending, onAction }: ItemCardProps) {
+export function ItemCard({ item, overdue = false, actionLabel = "Tamamla", pending, onAction, onEdit }: ItemCardProps) {
   return (
     <article className={overdue ? "item-card item-card--overdue" : "item-card"}>
       <div className={item.type === "reminder" ? "item-icon item-icon--reminder" : "item-icon"}>
@@ -33,15 +34,21 @@ export function ItemCard({ item, overdue = false, actionLabel = "Tamamla", pendi
           {item.type === "task" && !item.taskDate && <span>Tarih yok</span>}
         </div>
       </div>
-      <button
-        className="item-action"
-        type="button"
-        disabled={pending}
-        onClick={() => onAction(item)}
-      >
-        <CheckIcon />
-        <span>{pending ? "Kaydediliyor…" : actionLabel}</span>
-      </button>
+      <div className="item-actions">
+        <button className="item-action" type="button" disabled={pending} onClick={() => onEdit(item)} aria-label={`${item.title} kaydını düzenle`}>
+          <EditIcon />
+          <span>Düzenle</span>
+        </button>
+        <button
+          className="item-action"
+          type="button"
+          disabled={pending}
+          onClick={() => onAction(item)}
+        >
+          <CheckIcon />
+          <span>{pending ? "Kaydediliyor…" : actionLabel}</span>
+        </button>
+      </div>
     </article>
   );
 }

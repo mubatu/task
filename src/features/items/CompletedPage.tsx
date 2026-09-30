@@ -6,9 +6,10 @@ interface CompletedPageProps {
   loading: boolean;
   pendingItemId: string | null;
   onRestore: (item: Item) => void;
+  onEdit: (item: Item) => void;
 }
 
-export function CompletedPage({ items, loading, pendingItemId, onRestore }: CompletedPageProps) {
+export function CompletedPage({ items, loading, pendingItemId, onRestore, onEdit }: CompletedPageProps) {
   return (
     <div className="page-content">
       <header className="page-header">
@@ -34,6 +35,7 @@ export function CompletedPage({ items, loading, pendingItemId, onRestore }: Comp
               item={item}
               actionLabel="Geri al"
               pending={pendingItemId === item.id}
+              onEdit={onEdit}
               onAction={onRestore}
             />
           ))}

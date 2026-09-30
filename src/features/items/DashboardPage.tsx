@@ -12,6 +12,7 @@ interface DashboardPageProps {
   pendingItemId: string | null;
   onAdd: () => void;
   onComplete: (item: Item) => void;
+  onEdit: (item: Item) => void;
   onRetry: () => void;
 }
 
@@ -23,6 +24,7 @@ export function DashboardPage({
   pendingItemId,
   onAdd,
   onComplete,
+  onEdit,
   onRetry,
 }: DashboardPageProps) {
   const currentDateKey = todayKey(nowMs);
@@ -62,22 +64,22 @@ export function DashboardPage({
         <div className="dashboard-sections">
           {groups.overdue.length > 0 && (
             <ItemSection title="Vakti gelenler" count={groups.overdue.length} tone="danger">
-              {groups.overdue.map((item) => <ItemCard key={item.id} item={item} overdue pending={pendingItemId === item.id} onAction={onComplete} />)}
+              {groups.overdue.map((item) => <ItemCard key={item.id} item={item} overdue pending={pendingItemId === item.id} onEdit={onEdit} onAction={onComplete} />)}
             </ItemSection>
           )}
           {groups.today.length > 0 && (
             <ItemSection title="Bugün" count={groups.today.length}>
-              {groups.today.map((item) => <ItemCard key={item.id} item={item} pending={pendingItemId === item.id} onAction={onComplete} />)}
+              {groups.today.map((item) => <ItemCard key={item.id} item={item} pending={pendingItemId === item.id} onEdit={onEdit} onAction={onComplete} />)}
             </ItemSection>
           )}
           {groups.upcoming.length > 0 && (
             <ItemSection title="Yaklaşanlar" count={groups.upcoming.length}>
-              {groups.upcoming.map((item) => <ItemCard key={item.id} item={item} pending={pendingItemId === item.id} onAction={onComplete} />)}
+              {groups.upcoming.map((item) => <ItemCard key={item.id} item={item} pending={pendingItemId === item.id} onEdit={onEdit} onAction={onComplete} />)}
             </ItemSection>
           )}
           {groups.unscheduled.length > 0 && (
             <ItemSection title="Tarihsiz" count={groups.unscheduled.length}>
-              {groups.unscheduled.map((item) => <ItemCard key={item.id} item={item} pending={pendingItemId === item.id} onAction={onComplete} />)}
+              {groups.unscheduled.map((item) => <ItemCard key={item.id} item={item} pending={pendingItemId === item.id} onEdit={onEdit} onAction={onComplete} />)}
             </ItemSection>
           )}
         </div>

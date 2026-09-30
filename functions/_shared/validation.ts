@@ -97,7 +97,11 @@ export function requireDate(input: unknown): string {
   return input;
 }
 
-export function validateItemInput(input: Record<string, unknown>, nowMs = Date.now()): ValidatedItemInput {
+export function validateItemInput(
+  input: Record<string, unknown>,
+  nowMs = Date.now(),
+  existingRemindAt: number | null = null,
+): ValidatedItemInput {
   const userId = requireUserId(input.userId);
   const title = normalizeTitle(input.title);
   const details = normalizeDetails(input.details);
@@ -120,7 +124,7 @@ export function validateItemInput(input: Record<string, unknown>, nowMs = Date.n
   if (typeof input.remindAt !== "number" || !Number.isSafeInteger(input.remindAt)) {
     throw new HttpError(400, "Reminder time must be a valid timestamp.");
   }
-  if (input.remindAt <= nowMs) {
+  if (input.remindAt <= nowMs && input.remindAt !== existingRemindAt) {
     throw new HttpError(400, "Reminder time must be in the future.");
   }
 

@@ -16,7 +16,7 @@ import { useWebMcp } from "./lib/useWebMcp";
 
 export function App() {
   const [profile, setProfile] = useState<UserProfile | null>(loadProfile);
-  const [formOpen, setFormOpen] = useState(false);
+  const [form, setForm] = useState<{ item?: Item } | null>(null);
   const [pendingItemId, setPendingItemId] = useState<string | null>(null);
   const [mutationError, setMutationError] = useState<string | null>(null);
   const [online, setOnline] = useState(navigator.onLine);
@@ -48,6 +48,7 @@ export function App() {
   function handleLogout() {
     clearProfile();
     setProfile(null);
+    setForm(null);
     navigate("/");
   }
 
@@ -72,7 +73,7 @@ export function App() {
       route={route}
       online={online}
       onNavigate={navigate}
-      onAdd={() => setFormOpen(true)}
+      onAdd={() => setForm({})}
       onLogout={handleLogout}
     >
       <NotificationPrompt />
@@ -89,7 +90,8 @@ export function App() {
           loading={items.loading}
           error={items.error}
           pendingItemId={pendingItemId}
-          onAdd={() => setFormOpen(true)}
+          onAdd={() => setForm({})}
+          onEdit={(item) => setForm({ item })}
           onComplete={(item) => void changeStatus(item, "completed")}
           onRetry={() => void items.refresh()}
         />
@@ -99,7 +101,8 @@ export function App() {
           items={items.activeItems}
           nowMs={serverNowMs}
           pendingItemId={pendingItemId}
-          onAdd={() => setFormOpen(true)}
+          onAdd={() => setForm({})}
+          onEdit={(item) => setForm({ item })}
           onComplete={(item) => void changeStatus(item, "completed")}
         />
       )}
@@ -108,12 +111,22 @@ export function App() {
           items={items.completedItems}
           loading={items.loading}
           pendingItemId={pendingItemId}
+          onEdit={(item) => setForm({ item })}
           onRestore={(item) => void changeStatus(item, "active")}
         />
       )}
 
-      {formOpen && <ItemFormDialog onClose={() => setFormOpen(false)} onCreate={items.addItem} />}
-      {alerts.currentAlert && (
+      {form && (
+        <ItemFormDialog
+          key={form.item?.id ?? "new"}
+          item={form.item}
+          onClose={() => setForm(null)}
+          onSave={({ type, ...input }) => form.item
+            ? items.editItem(form.item, input)
+            : items.addItem({ type, ...input })}
+        />
+      )}
+      {!form && alerts.currentAlert && (
         <ReminderDialog
           item={alerts.currentAlert}
           remainingCount={alerts.alertCount}

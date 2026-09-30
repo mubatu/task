@@ -5,6 +5,7 @@ import {
   dateKeyFromTimestamp,
   parseIstanbulDateTime,
   shiftMonth,
+  toIstanbulDateTimeInput,
 } from "../src/lib/dateTime";
 
 describe("Istanbul date handling", () => {
@@ -14,6 +15,10 @@ describe("Istanbul date handling", () => {
 
   it("uses Istanbul boundaries for date keys", () => {
     expect(dateKeyFromTimestamp(Date.parse("2026-09-15T22:30:00Z"))).toBe("2026-09-16");
+  });
+
+  it("prefills reminder inputs in Istanbul time across midnight", () => {
+    expect(toIstanbulDateTimeInput(Date.parse("2026-09-30T21:45:12.345Z"))).toBe("2026-10-01T00:45");
   });
 
   it("adds exact 24-hour relative days", () => {

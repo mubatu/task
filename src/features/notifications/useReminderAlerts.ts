@@ -13,7 +13,7 @@ function loadAlertedKeys(): Set<string> {
 }
 
 function notificationKey(item: Item): string {
-  return `${item.id}:${item.updatedAt}`;
+  return `${item.id}:${item.remindAt}`;
 }
 
 async function showSystemNotification(item: Item): Promise<void> {
@@ -71,9 +71,15 @@ export function useReminderAlerts(items: Item[], serverOffsetMs: number) {
   }, [checkDueItems]);
 
   useEffect(() => {
-    const activeIds = new Set(items.map((item) => item.id));
-    setPendingAlerts((current) => current.filter((item) => activeIds.has(item.id)));
-  }, [items]);
+    const nowMs = Date.now() + serverOffsetMs;
+    const dueItems = new Map(items
+      .filter((item) => item.type === "reminder" && item.remindAt !== null && item.remindAt <= nowMs)
+      .map((item) => [item.id, item]));
+    setPendingAlerts((current) => current.flatMap((item) => {
+      const updated = dueItems.get(item.id);
+      return updated ? [updated] : [];
+    }));
+  }, [items, serverOffsetMs]);
 
   const dismissCurrent = useCallback(() => {
     setPendingAlerts((current) => current.slice(1));

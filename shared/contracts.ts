@@ -39,6 +39,8 @@ export interface UpdateItemStatusRequest {
   status: ItemStatus;
 }
 
+export type UpdateItemRequest = Omit<CreateItemRequest, "type">;
+
 export interface ApiError {
   error: string;
 }

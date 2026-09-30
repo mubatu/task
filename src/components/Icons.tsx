@@ -26,6 +26,10 @@ export function CheckIcon(props: IconProps) {
   return <svg {...baseProps} {...props}><path d="m5 12 4 4L19 6"/></svg>;
 }
 
+export function EditIcon(props: IconProps) {
+  return <svg {...baseProps} {...props}><path d="m16 3 5 5-12 12-6 1 1-6L16 3Z"/><path d="m13 6 5 5"/></svg>;
+}
+
 export function PlusIcon(props: IconProps) {
   return <svg {...baseProps} {...props}><path d="M12 5v14M5 12h14"/></svg>;
 }

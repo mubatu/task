@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import type { CreateItemRequest, Item, ItemStatus, UserProfile } from "../../../shared/contracts";
-import { createItem, getItems, updateItemStatus } from "../../lib/api";
+import type { CreateItemRequest, Item, ItemStatus, UpdateItemRequest, UserProfile } from "../../../shared/contracts";
+import { createItem, getItems, updateItem, updateItemStatus } from "../../lib/api";
 
 export function useItems(profile: UserProfile | null) {
   const [activeItems, setActiveItems] = useState<Item[]>([]);
@@ -73,6 +73,14 @@ export function useItems(profile: UserProfile | null) {
     return updated;
   }, [profile]);
 
+  const editItem = useCallback(async (item: Item, input: Omit<UpdateItemRequest, "userId">) => {
+    if (!profile) throw new Error("Profil bulunamadı.");
+    const updated = await updateItem(item.id, { ...input, userId: profile.id });
+    setActiveItems((current) => current.map((entry) => entry.id === updated.id ? updated : entry));
+    setCompletedItems((current) => current.map((entry) => entry.id === updated.id ? updated : entry));
+    return updated;
+  }, [profile]);
+
   return {
     activeItems,
     completedItems,
@@ -81,6 +89,7 @@ export function useItems(profile: UserProfile | null) {
     error,
     refresh,
     addItem,
+    editItem,
     setStatus,
   };
 }

@@ -4,7 +4,7 @@
 .notification-prompt strong { display: block; font-size: .9rem; }
 .notification-prompt p { margin: 3px 0 0; color: #667049; font-size: .78rem; line-height: 1.4; }
 .notification-prompt--muted p { color: #6f7580; }
-.notification-prompt button { min-height: 38px; padding: 0 13px; border: 0; border-radius: 9px; background: var(--dark); color: white; font-size: .76rem; font-weight: 750; cursor: pointer; }
+.notification-prompt button { min-height: 38px; padding: 0 13px; border: 0; border-radius: 9px; background: var(--dark); color: white; font-size: .76rem; cursor: pointer; }
 .reminder-backdrop { position: fixed; z-index: 100; inset: 0; padding: 24px; background: rgba(20,8,12,.68); display: grid; place-items: center; backdrop-filter: blur(7px); }
 .reminder-dialog { position: relative; width: min(480px, 100%); padding: 36px; border-radius: 24px; background: white; text-align: center; box-shadow: 0 30px 90px rgba(0,0,0,.35); }
 .reminder-close { position: absolute; top: 16px; right: 16px; }
@@ -13,7 +13,7 @@
 .reminder-dialog .eyebrow { color: var(--danger); }
 .reminder-dialog h2 { margin: 0 0 10px; font-size: 1.8rem; overflow-wrap: anywhere; }
 .reminder-details { margin: 0 auto 12px; max-width: 360px; color: var(--muted); line-height: 1.55; white-space: pre-line; }
-.reminder-dialog time { display: block; color: var(--danger); font-weight: 800; }
+.reminder-dialog time { display: block; color: var(--danger); }
 .remaining-alerts { margin-top: 12px; display: block; color: #858b96; font-size: .76rem; }
 .reminder-actions { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 

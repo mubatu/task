@@ -10,6 +10,7 @@ A mobile-first task and reminder dashboard built with React, TypeScript, Cloudfl
 - Dashboard, monthly calendar, and completed-item archive
 - In-app due reminder dialog and browser notifications while the site is open
 - Responsive desktop and mobile navigation
+- Bundled Momo Trust Display font with Turkish glyphs and a consistent regular weight
 - Cloudflare D1 persistence with server-side validation and ownership filtering
 
 ## Local development

@@ -1,6 +1,10 @@
 name = "task"
 main = "worker/index.ts"
 compatibility_date = "2026-09-16"
+# Serve production only from the custom domain. Preview URLs would share the production D1 database.
+routes = [{ pattern = "task.mubatu.com", custom_domain = true }]
+workers_dev = false
+preview_urls = false
 
 [assets]
 directory = "./dist"

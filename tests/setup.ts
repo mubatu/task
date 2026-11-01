@@ -4,6 +4,7 @@ import { cleanup } from "@testing-library/react";
 
 afterEach(() => {
   cleanup();
-  localStorage.clear();
-  sessionStorage.clear();
+  // Backend tests run in the node environment, which has no web storage.
+  globalThis.localStorage?.clear();
+  globalThis.sessionStorage?.clear();
 });

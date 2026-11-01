@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { CreateItemRequest, Item } from "../../shared/contracts";
 
-type CreateItemAction = (input: Omit<CreateItemRequest, "userId">) => Promise<Item>;
+type CreateItemAction = (input: CreateItemRequest) => Promise<Item>;
 
 export function useWebMcp(items: Item[], createItem: CreateItemAction): void {
   const itemsRef = useRef(items);

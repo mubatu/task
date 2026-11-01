@@ -7,7 +7,7 @@ import "../../styles/items.css";
 interface ItemFormDialogProps {
   onClose: () => void;
   item?: Item;
-  onSave: (input: Omit<CreateItemRequest, "userId">) => Promise<unknown>;
+  onSave: (input: CreateItemRequest) => Promise<unknown>;
 }
 
 export function ItemFormDialog({ onClose, onSave, item }: ItemFormDialogProps) {

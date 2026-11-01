@@ -1,13 +1,23 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CreateItemRequest, Item, ItemStatus, UpdateItemRequest, UserProfile } from "../../../shared/contracts";
-import { createItem, getItems, updateItem, updateItemStatus } from "../../lib/api";
+import { createItem, getItems, isUnauthorized, updateItem, updateItemStatus } from "../../lib/api";
 
-export function useItems(profile: UserProfile | null) {
+export function useItems(profile: UserProfile | null, onUnauthorized: () => void) {
   const [activeItems, setActiveItems] = useState<Item[]>([]);
   const [completedItems, setCompletedItems] = useState<Item[]>([]);
   const [serverOffsetMs, setServerOffsetMs] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Kept in a ref so a new callback identity does not re-trigger the fetch effect.
+  const onUnauthorizedRef = useRef(onUnauthorized);
+  onUnauthorizedRef.current = onUnauthorized;
+
+  // Any data request that comes back 401 means the session ended; drop back to sign-in.
+  const signOutOnUnauthorized = useCallback(<T,>(promise: Promise<T>): Promise<T> =>
+    promise.catch((requestError: unknown) => {
+      if (isUnauthorized(requestError)) onUnauthorizedRef.current();
+      throw requestError;
+    }), []);
 
   const refresh = useCallback(async (quiet = false) => {
     if (!profile) return;
@@ -15,8 +25,8 @@ export function useItems(profile: UserProfile | null) {
     try {
       const requestStartedAt = Date.now();
       const [activeResponse, completedResponse] = await Promise.all([
-        getItems(profile.id, "active"),
-        getItems(profile.id, "completed"),
+        getItems("active"),
+        getItems("completed"),
       ]);
       const requestFinishedAt = Date.now();
       const midpoint = requestStartedAt + (requestFinishedAt - requestStartedAt) / 2;
@@ -25,6 +35,10 @@ export function useItems(profile: UserProfile | null) {
       setCompletedItems(completedResponse.items);
       setError(null);
     } catch (requestError) {
+      if (isUnauthorized(requestError)) {
+        onUnauthorizedRef.current();
+        return;
+      }
       setError(requestError instanceof Error ? requestError.message : "Veriler yüklenemedi.");
     } finally {
       if (!quiet) setLoading(false);
@@ -53,16 +67,16 @@ export function useItems(profile: UserProfile | null) {
     };
   }, [profile, refresh]);
 
-  const addItem = useCallback(async (input: Omit<CreateItemRequest, "userId">) => {
+  const addItem = useCallback(async (input: CreateItemRequest) => {
     if (!profile) throw new Error("Profil bulunamadı.");
-    const item = await createItem({ ...input, userId: profile.id });
+    const item = await signOutOnUnauthorized(createItem(input));
     setActiveItems((current) => [...current, item]);
     return item;
-  }, [profile]);
+  }, [profile, signOutOnUnauthorized]);
 
   const setStatus = useCallback(async (item: Item, status: ItemStatus) => {
     if (!profile) throw new Error("Profil bulunamadı.");
-    const updated = await updateItemStatus(profile.id, item.id, status);
+    const updated = await signOutOnUnauthorized(updateItemStatus(item.id, status));
     if (status === "completed") {
       setActiveItems((current) => current.filter((entry) => entry.id !== item.id));
       setCompletedItems((current) => [updated, ...current]);
@@ -71,15 +85,15 @@ export function useItems(profile: UserProfile | null) {
       setActiveItems((current) => [...current, updated]);
     }
     return updated;
-  }, [profile]);
+  }, [profile, signOutOnUnauthorized]);
 
-  const editItem = useCallback(async (item: Item, input: Omit<UpdateItemRequest, "userId">) => {
+  const editItem = useCallback(async (item: Item, input: UpdateItemRequest) => {
     if (!profile) throw new Error("Profil bulunamadı.");
-    const updated = await updateItem(item.id, { ...input, userId: profile.id });
+    const updated = await signOutOnUnauthorized(updateItem(item.id, input));
     setActiveItems((current) => current.map((entry) => entry.id === updated.id ? updated : entry));
     setCompletedItems((current) => current.map((entry) => entry.id === updated.id ? updated : entry));
     return updated;
-  }, [profile]);
+  }, [profile, signOutOnUnauthorized]);
 
   return {
     activeItems,

@@ -29,14 +29,19 @@ function callPatch(body: unknown, existing: ItemRow | null = row) {
         bind(...values: unknown[]) {
           statement.values = values;
           return {
-            first: async () => existing,
+            // The router looks up the session first; every other lookup sees `existing`.
+            first: async () => (sql.includes("FROM auth_sessions") ? { id: row.user_id, display_name: "Batu" } : existing),
             run: async () => ({ meta: { changes: existing ? 1 : 0 } }),
           };
         },
       };
     }),
   };
-  const request = new Request(`http://localhost/api/items/${row.id}`, { method: "PATCH", body: JSON.stringify(body) });
+  const request = new Request(`http://localhost/api/items/${row.id}`, {
+    method: "PATCH",
+    headers: { Cookie: "task_session=token" },
+    body: JSON.stringify(body),
+  });
   const env = { DB: db } as unknown as Env;
   // Go through the router so HttpErrors become JSON responses as in production.
   return { response: worker.fetch(request, env), statements };
@@ -45,7 +50,7 @@ function callPatch(body: unknown, existing: ItemRow | null = row) {
 describe("item update endpoint", () => {
   it("updates reminder content with ownership filtering and preserves completion metadata", async () => {
     const remindAt = Date.now() + 172_800_000;
-    const { response, statements } = callPatch({ userId: row.user_id, title: "  Yeni buluşma ", details: "", remindAt });
+    const { response, statements } = callPatch({ title: "  Yeni buluşma ", details: "", remindAt });
     const result = await response;
     expect(result.status).toBe(200);
     expect(await result.json()).toMatchObject({ id: row.id, status: "completed", createdAt: 1000, completedAt: 3000 });
@@ -53,12 +58,12 @@ describe("item update endpoint", () => {
     expect(update.values).toEqual(["Yeni buluşma", "", null, remindAt, expect.any(Number), row.id, row.user_id]);
     expect(update.sql).toContain("WHERE id = ? AND user_id = ?");
     expect(update.sql).not.toMatch(/SET status|completed_at_ms =|created_at_ms =/);
-    expect(statements.filter(({ sql }) => sql.startsWith("SELECT")).every(({ values }) => values[1] === row.user_id)).toBe(true);
+    expect(statements.filter(({ sql }) => sql.startsWith("SELECT") && sql.includes("FROM items")).every(({ values }) => values[1] === row.user_id)).toBe(true);
   });
 
   it("updates and clears task dates without changing the item type", async () => {
     for (const taskDate of ["2026-10-03", null]) {
-      const { response, statements } = callPatch({ userId: row.user_id, title: row.title, taskDate }, { ...row, type: "task", task_date: "2026-10-01", remind_at_ms: null });
+      const { response, statements } = callPatch({ title: row.title, taskDate }, { ...row, type: "task", task_date: "2026-10-01", remind_at_ms: null });
       expect((await response).status).toBe(200);
       const update = statements.find(({ sql }) => sql.startsWith("UPDATE"))!;
       expect(update.values.slice(0, 4)).toEqual([row.title, "", taskDate, null]);
@@ -67,7 +72,7 @@ describe("item update endpoint", () => {
   });
 
   it("returns 404 without writing when the ownership-filtered lookup finds no item", async () => {
-    const { response, statements } = callPatch({ userId: row.user_id, title: "Missing", remindAt: row.remind_at_ms }, null);
+    const { response, statements } = callPatch({ title: "Missing", remindAt: row.remind_at_ms }, null);
     expect((await response).status).toBe(404);
     expect(statements.some(({ sql }) => sql.startsWith("UPDATE"))).toBe(false);
   });
@@ -75,20 +80,20 @@ describe("item update endpoint", () => {
   it("allows retaining an overdue time but rejects rescheduling into the past", async () => {
     const past = Date.now() - 60_000;
     const existing = { ...row, remind_at_ms: past };
-    expect((await callPatch({ userId: row.user_id, title: "Yeni başlık", remindAt: past }, existing).response).status).toBe(200);
-    const { response, statements } = callPatch({ userId: row.user_id, title: "Yeni başlık", remindAt: past - 1000 }, existing);
+    expect((await callPatch({ title: "Yeni başlık", remindAt: past }, existing).response).status).toBe(200);
+    const { response, statements } = callPatch({ title: "Yeni başlık", remindAt: past - 1000 }, existing);
     expect((await response).status).toBe(400);
     expect(statements.some(({ sql }) => sql.startsWith("UPDATE"))).toBe(false);
   });
 
-  it.each([null, [], {}, { userId: row.user_id, title: " " }, { userId: row.user_id, title: "Bad time", remindAt: "tomorrow" }, { userId: row.user_id, status: "completed", title: "Mixed update" }])("rejects invalid input %j without writing", async (body) => {
+  it.each([null, [], {}, { title: " " }, { title: "Bad time", remindAt: "tomorrow" }, { status: "completed", title: "Mixed update" }])("rejects invalid input %j without writing", async (body) => {
     const { response, statements } = callPatch(body);
     expect((await response).status).toBe(400);
     expect(statements.some(({ sql }) => sql.startsWith("UPDATE"))).toBe(false);
   });
 
   it.each(["active", "completed"])("preserves the existing status-only %s action", async (status) => {
-    const { response, statements } = callPatch({ userId: row.user_id, status });
+    const { response, statements } = callPatch({ status });
     expect((await response).status).toBe(200);
     const update = statements.find(({ sql }) => sql.startsWith("UPDATE"))!;
     expect(update.values).toEqual([status, status === "completed" ? expect.any(Number) : null, expect.any(Number), row.id, row.user_id]);

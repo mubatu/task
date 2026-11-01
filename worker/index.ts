@@ -1,24 +1,26 @@
+import { getSessionUser, type SessionUser } from "./lib/auth";
 import type { Env } from "./lib/env";
 import { handleError, HttpError, json } from "./lib/http";
+import { getAuthSession, postGoogleSignIn, postLogout } from "./routes/auth";
 import { patchItem } from "./routes/item";
 import { getItems, postItem } from "./routes/items";
-import { postProfile } from "./routes/profile";
 
 type PublicHandler = (request: Request, env: Env) => Promise<Response>;
+type SignedInHandler = (request: Request, env: Env, user: SessionUser) => Promise<Response>;
 
-interface Route {
-  method: string;
-  // Segments starting with ":" match any single non-empty path segment.
-  path: string;
-  public: true;
-  handler: PublicHandler;
-}
+// Segments of `path` starting with ":" match any single non-empty path segment.
+type Route = { method: string; path: string } & (
+  | { public: true; handler: PublicHandler }
+  | { public?: false; handler: SignedInHandler }
+);
 
 const ROUTES: Route[] = [
-  { method: "POST", path: "/api/profile", public: true, handler: postProfile },
-  { method: "GET", path: "/api/items", public: true, handler: getItems },
-  { method: "POST", path: "/api/items", public: true, handler: postItem },
-  { method: "PATCH", path: "/api/items/:id", public: true, handler: patchItem },
+  { method: "GET", path: "/api/auth/session", public: true, handler: getAuthSession },
+  { method: "POST", path: "/api/auth/google", public: true, handler: postGoogleSignIn },
+  { method: "POST", path: "/api/auth/logout", public: true, handler: postLogout },
+  { method: "GET", path: "/api/items", handler: getItems },
+  { method: "POST", path: "/api/items", handler: postItem },
+  { method: "PATCH", path: "/api/items/:id", handler: patchItem },
 ];
 
 function matchesPath(pattern: string, pathname: string): boolean {
@@ -35,6 +37,14 @@ export async function handleApiRequest(request: Request, env: Env): Promise<Resp
     const url = new URL(request.url);
     const method = request.method;
 
+    // The session cookie is SameSite=Lax; also reject cross-site writes outright.
+    if (method !== "GET" && method !== "HEAD") {
+      const origin = request.headers.get("Origin");
+      if (origin && origin !== url.origin) {
+        throw new HttpError(403, "Cross-site requests are not allowed.");
+      }
+    }
+
     const pathRoutes = ROUTES.filter((route) => matchesPath(route.path, url.pathname));
     if (pathRoutes.length === 0) throw new HttpError(404, "Not found.");
 
@@ -49,7 +59,11 @@ export async function handleApiRequest(request: Request, env: Env): Promise<Resp
       );
     }
 
-    return await route.handler(request, env);
+    if (route.public) return await route.handler(request, env);
+
+    const user = await getSessionUser(env, request);
+    if (!user) throw new HttpError(401, "Sign in to continue.");
+    return await route.handler(request, env, user);
   } catch (error) {
     return handleError(error);
   }

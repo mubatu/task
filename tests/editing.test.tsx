@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Item } from "../shared/contracts";
 import { App } from "../src/App";
-import { saveProfile } from "../src/features/auth/profileStorage";
 import { ItemFormDialog } from "../src/features/items/ItemFormDialog";
 import { useReminderAlerts } from "../src/features/notifications/useReminderAlerts";
 import { todayKey, toIstanbulDateTimeInput } from "../src/lib/dateTime";
@@ -35,9 +34,11 @@ describe("editing items", () => {
       ? { ...item, status: "completed" as const, completedAt: item.createdAt }
       : { ...item };
     if (route === "/calendar") stored.remindAt = Date.now() + 60_000;
-    saveProfile({ id: item.userId, displayName: "Miniş" });
     window.history.replaceState({}, "", route);
     const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url === "/api/auth/session") {
+        return { ok: true, json: async () => ({ user: { id: item.userId, displayName: "Miniş" }, googleClientId: "client-id" }) };
+      }
       if (init?.method === "PATCH") {
         stored = { ...stored, ...JSON.parse(init.body as string), updatedAt: Date.now() };
         return { ok: true, json: async () => stored };

@@ -1,19 +1,13 @@
 import type { CreateItemRequest, ItemsResponse } from "../../shared/contracts";
+import type { SessionUser } from "../lib/auth";
 import type { Env } from "../lib/env";
-import { HttpError, json, readJson } from "../lib/http";
+import { json, readJson } from "../lib/http";
 import { ITEM_COLUMNS, serializeItem, type ItemRow } from "../lib/items";
-import { requireItemStatus, requireUserId, validateItemInput } from "../lib/validation";
+import { requireItemStatus, validateItemInput } from "../lib/validation";
 
-async function requireExistingUser(db: D1Database, userId: string): Promise<void> {
-  const user = await db.prepare("SELECT id FROM users WHERE id = ?").bind(userId).first();
-  if (!user) throw new HttpError(404, "User was not found.");
-}
-
-export async function getItems(request: Request, env: Env): Promise<Response> {
+export async function getItems(request: Request, env: Env, user: SessionUser): Promise<Response> {
   const url = new URL(request.url);
-  const userId = requireUserId(url.searchParams.get("userId"));
   const status = requireItemStatus(url.searchParams.get("status"));
-  await requireExistingUser(env.DB, userId);
 
   const orderBy = status === "completed"
     ? "completed_at_ms DESC, created_at_ms DESC"
@@ -25,7 +19,7 @@ export async function getItems(request: Request, env: Env): Promise<Response> {
      WHERE user_id = ? AND status = ?
      ORDER BY ${orderBy}`,
   )
-    .bind(userId, status)
+    .bind(user.id, status)
     .all<ItemRow>();
 
   const response: ItemsResponse = {
@@ -35,10 +29,9 @@ export async function getItems(request: Request, env: Env): Promise<Response> {
   return json(response);
 }
 
-export async function postItem(request: Request, env: Env): Promise<Response> {
+export async function postItem(request: Request, env: Env, user: SessionUser): Promise<Response> {
   const body = await readJson<CreateItemRequest>(request);
   const input = validateItemInput(body as unknown as Record<string, unknown>);
-  await requireExistingUser(env.DB, input.userId);
 
   const id = crypto.randomUUID();
   const nowMs = Date.now();
@@ -50,7 +43,7 @@ export async function postItem(request: Request, env: Env): Promise<Response> {
   )
     .bind(
       id,
-      input.userId,
+      user.id,
       input.type,
       input.title,
       input.details,

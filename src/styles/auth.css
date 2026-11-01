@@ -11,6 +11,14 @@
 .login-field button { min-width: 112px; border: 0; border-radius: 10px; background: var(--dark); color: white; cursor: pointer; }
 .login-field button:disabled { opacity: .5; cursor: wait; }
 .login-note { margin-top: 16px; color: #8b919d; font-size: .78rem; }
+.login-google { min-height: 44px; }
+.google-button { width: 100%; max-width: 400px; }
+.login-setup h2 { margin: 0 0 14px; font-size: 1.15rem; letter-spacing: -.02em; }
+.login-choices { display: grid; gap: 10px; }
+.login-choices button { min-height: 54px; padding: 0 18px; border: 1px solid #d8dbe1; border-radius: 15px; background: white; color: var(--dark); box-shadow: 0 8px 30px rgba(23,27,36,.05); font-size: 1rem; text-align: left; cursor: pointer; }
+.login-choices button:hover, .login-choices button:focus-visible { border-color: #8cae2d; box-shadow: 0 0 0 4px rgba(200,240,90,.25); }
+.login-note a { color: inherit; }
+.login-link { margin-top: 10px; padding: 6px 0; border: 0; background: none; color: var(--dark); font-size: .85rem; text-decoration: underline; cursor: pointer; }
 .login-art { position: relative; min-height: 100vh; overflow: hidden; background: var(--dark); display: grid; place-items: center; }
 .orb { position: absolute; border-radius: 50%; filter: blur(1px); }
 .orb--one { width: 430px; height: 430px; top: -150px; right: -90px; background: var(--accent); opacity: .94; }
@@ -33,3 +41,5 @@
   .login-field button { width: 100%; min-height: 48px; margin-top: 4px; }
   .login-art { display: none; }
 }
+.session-check { min-height: 100vh; display: grid; place-items: center; color: var(--muted); text-align: center; }
+.session-check button { min-height: 44px; padding: 0 18px; border: 0; border-radius: 12px; background: var(--dark); color: white; cursor: pointer; }

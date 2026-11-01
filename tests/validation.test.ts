@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HttpError } from "../functions/_shared/http";
+import { HttpError } from "../worker/lib/http";
 import {
   normalizeDetails,
   normalizeProfileName,
@@ -7,7 +7,7 @@ import {
   requireDate,
   requireItemStatus,
   validateItemInput,
-} from "../functions/_shared/validation";
+} from "../worker/lib/validation";
 
 const userId = "123e4567-e89b-42d3-a456-426614174000";
 

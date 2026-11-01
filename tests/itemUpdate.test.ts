@@ -1,8 +1,9 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { describe, expect, it, vi } from "vitest";
-import { onRequestPatch } from "../functions/api/items/[id]";
-import type { ItemRow } from "../functions/_shared/items";
+import worker from "../worker/index";
+import type { Env } from "../worker/lib/env";
+import type { ItemRow } from "../worker/lib/items";
 
 const row: ItemRow = {
   id: "123e4567-e89b-42d3-a456-426614174001",
@@ -35,12 +36,10 @@ function callPatch(body: unknown, existing: ItemRow | null = row) {
       };
     }),
   };
-  const context = {
-    params: { id: row.id },
-    request: new Request(`http://localhost/api/items/${row.id}`, { method: "PATCH", body: JSON.stringify(body) }),
-    env: { DB: db },
-  } as unknown as Parameters<typeof onRequestPatch>[0];
-  return { response: onRequestPatch(context), statements };
+  const request = new Request(`http://localhost/api/items/${row.id}`, { method: "PATCH", body: JSON.stringify(body) });
+  const env = { DB: db } as unknown as Env;
+  // Go through the router so HttpErrors become JSON responses as in production.
+  return { response: worker.fetch(request, env), statements };
 }
 
 describe("item update endpoint", () => {

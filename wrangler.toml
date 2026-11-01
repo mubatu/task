@@ -1,6 +1,16 @@
 name = "task"
-pages_build_output_dir = "./dist"
+main = "worker/index.ts"
 compatibility_date = "2026-09-16"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+# Only API calls run the Worker; pages and scripts are served directly.
+run_worker_first = ["/api/*"]
+
+[observability]
+enabled = true
 
 [[d1_databases]]
 binding = "DB"

@@ -9,8 +9,6 @@ import {
   validateItemInput,
 } from "../worker/lib/validation";
 
-const userId = "123e4567-e89b-42d3-a456-426614174000";
-
 describe("profile name normalization", () => {
   it("normalizes equivalent names to the same key", () => {
     expect(normalizeProfileName("  Batu   Kaya ")).toEqual({
@@ -30,7 +28,6 @@ describe("profile name normalization", () => {
 describe("item validation", () => {
   it("accepts an undated task and strips reminder-only fields", () => {
     expect(validateItemInput({
-      userId,
       type: "task",
       title: "  Prepare   the plan ",
       details: "  Keep it concise. ",
@@ -46,7 +43,6 @@ describe("item validation", () => {
 
   it("accepts a future reminder", () => {
     expect(validateItemInput({
-      userId,
       type: "reminder",
       title: "Call the team",
       remindAt: 2_000,
@@ -59,7 +55,7 @@ describe("item validation", () => {
   });
 
   it("rejects past reminders and invalid field values", () => {
-    expect(() => validateItemInput({ userId, type: "reminder", title: "Late", remindAt: 999 }, 1_000)).toThrow(HttpError);
+    expect(() => validateItemInput({ type: "reminder", title: "Late", remindAt: 999 }, 1_000)).toThrow(HttpError);
     expect(() => normalizeTitle(" ")).toThrow(HttpError);
     expect(() => normalizeDetails("a".repeat(1001))).toThrow(HttpError);
     expect(() => requireDate("2026-02-30")).toThrow(HttpError);

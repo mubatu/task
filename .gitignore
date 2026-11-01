@@ -4,3 +4,6 @@ dist
 .DS_Store
 coverage
 *.tsbuildinfo
+.dev.vars
+# OAuth client JSON downloaded from Google Cloud Console; the app does not use the secret.
+client_secret*.json

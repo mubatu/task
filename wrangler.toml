@@ -21,3 +21,7 @@ binding = "DB"
 database_name = "task"
 database_id = "b89f037e-36ca-4be3-9f84-7252213a1211"
 migrations_dir = "migrations"
+
+[vars]
+# OAuth 2.0 Web client ID from Google Cloud Console. It is public, not a secret.
+GOOGLE_CLIENT_ID = "799335099329-75e31api4hqkk7ria7ond4n9de4l4nts.apps.googleusercontent.com"

@@ -14,7 +14,6 @@ export interface NormalizedName {
 }
 
 export interface ValidatedItemInput {
-  userId: string;
   type: ItemType;
   title: string;
   details: string;
@@ -35,13 +34,6 @@ export function normalizeProfileName(input: unknown): NormalizedName {
     displayName,
     nameKey: displayName.normalize("NFKC").toLowerCase(),
   };
-}
-
-export function requireUserId(input: unknown): string {
-  if (typeof input !== "string" || !UUID_PATTERN.test(input)) {
-    throw new HttpError(400, "A valid user ID is required.");
-  }
-  return input;
 }
 
 export function requireItemId(input: unknown): string {
@@ -102,7 +94,6 @@ export function validateItemInput(
   nowMs = Date.now(),
   existingRemindAt: number | null = null,
 ): ValidatedItemInput {
-  const userId = requireUserId(input.userId);
   const title = normalizeTitle(input.title);
   const details = normalizeDetails(input.details);
   const type = input.type;
@@ -112,7 +103,6 @@ export function validateItemInput(
 
   if (type === "task") {
     return {
-      userId,
       type,
       title,
       details,
@@ -129,7 +119,6 @@ export function validateItemInput(
   }
 
   return {
-    userId,
     type,
     title,
     details,

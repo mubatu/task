@@ -56,7 +56,7 @@ export function AppShell({
           <span className="profile-avatar"><UserIcon /></span>
           <div>
             <strong>{profile.displayName}</strong>
-            <button type="button" onClick={onLogout}>Kullanıcı değiştir</button>
+            <button type="button" onClick={onLogout}>Çıkış yap</button>
           </div>
         </div>
       </aside>
@@ -72,7 +72,7 @@ export function AppShell({
             <span className="brand-mark"><CheckIcon /></span>
             <span>Odak</span>
           </button>
-          <button className="mobile-profile" type="button" onClick={onLogout} aria-label="Kullanıcı değiştir">
+          <button className="mobile-profile" type="button" onClick={onLogout} aria-label="Çıkış yap">
             {profile.displayName.charAt(0).toLocaleUpperCase("tr-TR")}
           </button>
         </header>
